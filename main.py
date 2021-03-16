@@ -1,7 +1,6 @@
 import json
 import requests
 from fake_useragent import UserAgent
-# import sqlite3
 from hashlib import md5
 from bs4 import BeautifulSoup
 from config import API_TOKEN, CHAT_ID, LOGIN, PASSWORD, UID_FILE
