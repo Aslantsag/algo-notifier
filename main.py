@@ -1,4 +1,6 @@
 import json
+import time
+import webbrowser
 import requests
 from fake_useragent import UserAgent
 from hashlib import md5
@@ -7,7 +9,6 @@ from config import API_TOKEN, CHAT_ID, LOGIN, PASSWORD, UID_FILE
 
 
 class Message:
-
     url_login = 'https://backoffice.algoritmika.org/auth/login'
     url_main = 'https://backoffice.algoritmika.org'
 
@@ -49,6 +50,7 @@ class Message:
                         msg = f"[Алгоритмика] {m['name']} \n {m['content']}"
                         self.send_message(msg)
                         self.add_uid(content_hash)
+                        # self.browse_url(f"{self.url_main}{m['link']}")
         else:
             print(self.auth()[0])
 
@@ -62,14 +64,15 @@ class Message:
         response = requests.get(url)
         return response
 
+    def browse_url(self, url):
+        webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(
+            "C://Program Files (x86)//Google//Chrome//Application//chrome.exe"))
+        webbrowser.get('chrome').open(url)
+
     def get_uid(self, uid):
         with open(UID_FILE, 'r') as uid_file:
             uid_list = uid_file.read().split(",")
-
-            if uid in uid_list:
-                return True
-            else:
-                return False
+            return uid in uid_list
 
     def add_uid(self, uid):
         with open(UID_FILE, 'a') as uid_file:
@@ -80,4 +83,14 @@ if __name__ == '__main__':
     obj = Message()
 
     while True:
-        obj.new_projects()
+        try:
+            obj.new_projects()
+        except requests.exceptions.HTTPError as err:
+            print("HTTP Error:", err)
+        except requests.exceptions.ConnectionError as err:
+            print("Error Connecting:", err)
+        except requests.exceptions.Timeout as err:
+            print("Timeout Error:", err)
+        except requests.exceptions.RequestException as err:
+            print("Error!", err)
+        time.sleep(5)
