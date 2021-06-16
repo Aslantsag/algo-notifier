@@ -17,7 +17,6 @@ class Message:
         request = client.get(self.url_login)
         cookies = request.cookies.get_dict()
         soup = BeautifulSoup(request.text, 'html.parser')
-
         csrf = soup.find('input', dict(name='_csrf'))['value']
 
         data = {
@@ -33,7 +32,6 @@ class Message:
         }
 
         request = client.post(self.url_login, cookies=cookies, data=data, headers=headers)
-
         return request.status_code, client
 
     def new_projects(self):
